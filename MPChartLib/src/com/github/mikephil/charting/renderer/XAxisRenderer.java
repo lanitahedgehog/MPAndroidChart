@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.util.Log;
 import android.util.Size;
 
 import com.github.mikephil.charting.components.LimitLine;
@@ -23,6 +24,9 @@ public class XAxisRenderer extends AxisRenderer {
 
     protected XAxis mXAxis;
 
+    /** paint object for the even grid space */
+    private Paint mEvenGridSpacePaint;
+
     public XAxisRenderer(ViewPortHandler viewPortHandler, XAxis xAxis, Transformer trans) {
         super(viewPortHandler, trans);
 
@@ -31,6 +35,8 @@ public class XAxisRenderer extends AxisRenderer {
         mAxisLabelPaint.setColor(Color.BLACK);
         mAxisLabelPaint.setTextAlign(Align.CENTER);
         mAxisLabelPaint.setTextSize(Utils.convertDpToPixel(10f));
+
+        mEvenGridSpacePaint = new Paint();
     }
 
     public void computeAxis(float xValAverageLength, List<String> xValues) {
@@ -195,19 +201,34 @@ public class XAxisRenderer extends AxisRenderer {
                 0f, 0f
         };
 
+        int evenGridSpaceColor = mXAxis.getEvenGridSpaceColor();
+        float[] nextGridLinePosition = {0f, 0f};
+
         mGridPaint.setColor(mXAxis.getGridColor());
         mGridPaint.setStrokeWidth(mXAxis.getGridLineWidth());
         mGridPaint.setPathEffect(mXAxis.getGridDashPathEffect());
 
+        mEvenGridSpacePaint.setColor(evenGridSpaceColor);
+
         Path gridLinePath = new Path();
 
-        for (int i = mMinX; i <= mMaxX; i += mXAxis.mAxisLabelModulus) {
+        for (int i = mMinX, gridLineOrder = 0; i <= mMaxX; i += mXAxis.mAxisLabelModulus, gridLineOrder ++) {
 
             position[0] = i;
+
+            if(i + mXAxis.mAxisLabelModulus <= mMaxX) {
+                nextGridLinePosition[0] = i + mXAxis.mAxisLabelModulus;
+                mTrans.pointValuesToPixel(nextGridLinePosition);
+            }
+
             mTrans.pointValuesToPixel(position);
 
             if (position[0] >= mViewPortHandler.offsetLeft()
                     && position[0] <= mViewPortHandler.getChartWidth()) {
+
+                if(gridLineOrder %2 == 0 && mXAxis.isDrawEvenGridSpaceInDiffColor()) {
+                    c.drawRect(position[0], mViewPortHandler.contentTop(), nextGridLinePosition[0], mViewPortHandler.contentBottom(), mEvenGridSpacePaint);
+                }
 
                 gridLinePath.moveTo(position[0], mViewPortHandler.contentBottom());
                 gridLinePath.lineTo(position[0], mViewPortHandler.contentTop());

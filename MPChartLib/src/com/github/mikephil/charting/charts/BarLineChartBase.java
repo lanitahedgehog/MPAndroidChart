@@ -170,9 +170,7 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
         mGridBackgroundPaint = new Paint();
         mGridBackgroundPaint.setStyle(Style.FILL);
-        // mGridBackgroundPaint.setColor(Color.WHITE);
-        mGridBackgroundPaint.setColor(Color.rgb(240, 240, 240)); // light
-        // grey
+        mGridBackgroundPaint.setColor(Color.WHITE);
 
         mBorderPaint = new Paint();
         mBorderPaint.setStyle(Style.STROKE);

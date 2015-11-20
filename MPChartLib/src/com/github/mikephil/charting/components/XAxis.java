@@ -1,6 +1,8 @@
 
 package com.github.mikephil.charting.components;
 
+import android.graphics.Color;
+
 import com.github.mikephil.charting.formatter.DefaultXAxisValueFormatter;
 import com.github.mikephil.charting.formatter.XAxisValueFormatter;
 import com.github.mikephil.charting.utils.Utils;
@@ -81,6 +83,15 @@ public class XAxis extends AxisBase {
      */
     private boolean mAvoidFirstLastClipping = false;
 
+    /** If set to true, even grid spaces will be indicated with a different color.
+     * Use method {@link #setEvenGridSpaceColor(int)} to set the color for even "grid space".
+     * Default color is white
+     */
+    private boolean mDrawEvenGridSpaceInDiffColor = false;
+
+    /** Color value that is used to indicate even "grid space" */
+    private int evenGridSpaceColor;
+
     /**
      * Custom formatter for adjusting x-value strings
      */
@@ -114,6 +125,28 @@ public class XAxis extends AxisBase {
      */
     public void setPosition(XAxisPosition pos) {
         mPosition = pos;
+    }
+
+    /** Returns the value that indicates whether even "grid spaces" will be drawn using a different color */
+    public boolean isDrawEvenGridSpaceInDiffColor() {
+        return mDrawEvenGridSpaceInDiffColor;
+    }
+
+    /** Sets the value whether even "grid spaces" will be drawn using a different color */
+    public void setDrawEvenGridSpaceInDiffColor(boolean enabled) {
+        this.mDrawEvenGridSpaceInDiffColor = enabled;
+    }
+
+    /** Returns value for the color that is used to indicate even "grid space" */
+    public int getEvenGridSpaceColor() {
+        if(evenGridSpaceColor == 0)
+            evenGridSpaceColor = Color.WHITE;
+        return evenGridSpaceColor;
+    }
+
+    /** Sets the color value that will be used to indicate even "grid space" */
+    public void setEvenGridSpaceColor(int evenGridSpaceColor) {
+        this.evenGridSpaceColor = evenGridSpaceColor;
     }
 
     /**
