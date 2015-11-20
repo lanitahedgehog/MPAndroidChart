@@ -1,11 +1,15 @@
 package com.github.mikephil.charting.components;
 
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.DefaultYAxisValueFormatter;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.formatter.YAxisValueFormatter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing the y-axis labels settings and its entries. Only use the setter methods to modify it. Do not
@@ -72,6 +76,8 @@ public class YAxis extends AxisBase {
 	/** the position of the y-labels relative to the chart */
 	private YAxisLabelPosition mPosition = YAxisLabelPosition.OUTSIDE_CHART;
 
+	private List<Annotation> annotations;
+
 	/** enum for the position of the y-labels relative to the chart */
 	public enum YAxisLabelPosition {
 		OUTSIDE_CHART, INSIDE_CHART
@@ -93,12 +99,14 @@ public class YAxis extends AxisBase {
 		super();
 		this.mAxisDependency = AxisDependency.LEFT;
 		this.mYOffset = 0f;
+		annotations = new ArrayList<>();
 	}
 
 	public YAxis(AxisDependency position) {
 		super();
 		this.mAxisDependency = position;
 		this.mYOffset = 0f;
+		annotations = new ArrayList<>();
 	}
 
 	public AxisDependency getAxisDependency() {
@@ -414,5 +422,27 @@ public class YAxis extends AxisBase {
 			return true;
 		else
 			return false;
+	}
+
+							// following methods that are responsible for adding/removing annotations for Y axis
+
+	public void addAnnotation(Annotation annotation) {
+		annotations.add(annotation);
+		if (mLimitLines.size() > 6) {
+			Log.e("MPAndroiChart",
+					"Warning! You have more than 6 Annotations on your axis, do you really want that?");
+		}
+	}
+
+	public void removeAnnotation(Annotation annotation) {
+		annotations.remove(annotation);
+	}
+
+	public void removeAllAnnotations() {
+		annotations.clear();
+	}
+
+	public List<Annotation> getAnnotations() {
+		return annotations;
 	}
 }

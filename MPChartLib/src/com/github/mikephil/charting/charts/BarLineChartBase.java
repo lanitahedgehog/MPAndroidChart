@@ -266,6 +266,9 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         mAxisRendererLeft.renderAxisLabels(canvas);
         mAxisRendererRight.renderAxisLabels(canvas);
 
+        //now annotations are supported only for right yAxis
+        mAxisRendererRight.renderAnnotations(canvas);
+
         mRenderer.drawValues(canvas);
 
         mLegendRenderer.renderLegend(canvas);

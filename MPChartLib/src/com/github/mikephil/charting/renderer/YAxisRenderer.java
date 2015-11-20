@@ -5,7 +5,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Path;
+import android.graphics.RectF;
 
+import com.github.mikephil.charting.components.Annotation;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.components.YAxis.AxisDependency;
@@ -21,6 +23,8 @@ public class YAxisRenderer extends AxisRenderer {
 
     protected YAxis mYAxis;
 
+    protected Paint mAnnotationPaint;
+
     public YAxisRenderer(ViewPortHandler viewPortHandler, YAxis yAxis, Transformer trans) {
         super(viewPortHandler, trans);
 
@@ -28,6 +32,9 @@ public class YAxisRenderer extends AxisRenderer {
 
         mAxisLabelPaint.setColor(Color.BLACK);
         mAxisLabelPaint.setTextSize(Utils.convertDpToPixel(10f));
+
+        mAnnotationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     }
 
     /**
@@ -363,4 +370,68 @@ public class YAxisRenderer extends AxisRenderer {
             }
         }
     }
+
+    public void renderAnnotations(Canvas c) {
+        List<Annotation> annotations = mYAxis.getAnnotations();
+
+        if (annotations == null || annotations.size() <= 0)
+            return;
+
+        float[] pts = new float[2];
+        Path annotationPath = new Path();
+
+        for (int i = 0; i < annotations.size(); i++) {
+
+            Annotation a = annotations.get(i);
+
+            if(!a.isEnabled())
+                continue;
+
+            mAnnotationPaint.setStyle(Paint.Style.STROKE);
+            mAnnotationPaint.setColor(a.getAnnotationColor());
+            mAnnotationPaint.setStrokeWidth(a.getLineWidth());
+
+            pts[1] = a.getValue(); // in this case we get annotationValue
+
+            mTrans.pointValuesToPixel(pts);
+
+            annotationPath.moveTo(mViewPortHandler.contentLeft(), pts[1]);
+            annotationPath.lineTo(mViewPortHandler.contentRight(), pts[1]);
+
+            //here draw annotation line
+            c.drawPath(annotationPath, mAnnotationPaint);
+            annotationPath.reset();
+
+            if(a.isLabelDrawEnabled()) {
+
+                String label = a.getLabel();
+
+                mAnnotationPaint.setStyle(Paint.Style.FILL);
+                mAnnotationPaint.setStyle(a.getTextStyle());
+                mAnnotationPaint.setTypeface(mYAxis.getTypeface());
+                mAnnotationPaint.setTextSize(mYAxis.getTextSize());
+
+                float labelLineHeight = Utils.calcTextHeight(mAnnotationPaint, label);
+                float labelLineWidth = Utils.calcTextWidth(mAnnotationPaint, label);
+
+                //now draw rectangle next to annotation line
+
+                RectF labelBoxCoord = new RectF(mViewPortHandler.contentRight(), pts[1] - labelLineHeight, mViewPortHandler.contentRight() + labelLineWidth + mYAxis.getXOffset() * 1.5f, pts[1] + labelLineHeight);
+                c.drawRoundRect(labelBoxCoord, 10, 10, mAnnotationPaint);
+
+                float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
+
+                float fixedXpos = mViewPortHandler.contentRight() + mYAxis.getXOffset();
+
+                mAnnotationPaint.setColor(a.getTextColor());
+                mAnnotationPaint.setTextAlign(Align.LEFT);
+
+                //now draw text-label for an annotation
+                c.drawText(label, fixedXpos, pts[1] + yoffset, mAnnotationPaint);
+
+            }
+        }
+    }
+
+
 }
